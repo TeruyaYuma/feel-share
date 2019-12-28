@@ -1,0 +1,15 @@
+{
+    "extends": [
+      "eslint:recommended" 
+    ],
+    "parserOptions": {
+      "sourceType": "module" 
+    },
+    "env": {
+      "browser": true, 
+      "jquery": true
+    },
+    "plugins": [],
+    "rules": {},
+    "globals": {}
+  }
