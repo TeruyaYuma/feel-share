@@ -2,20 +2,21 @@
 require('function.php');
 
 debug('「「「「「「「「「「「「「「「「「「「「「「「「「「「「「');
-debug('「　ユーザー登録　');
+debug('「　ログイン　');
 debug('「「「「「「「「「「「「「「「「「「「「「「「「「「「「「');
 debugLogStart();
+
+require('auth.php');
 
 if(!empty($_POST)) {
     debug('POSTされました。');
 
     $email = $_POST['email'];
     $pass = $_POST['password'];
-    $pass_re = $_POST['password_re'];
+    $pass_save = !empty($_POST['pass_save']) ? $_POST['pass_save'] : '';
 
     validRequire($email, 'email');
     validRequire($pass, 'password');
-    validRequire($pass_re, 'password_re');
 
     if(empty($err_msg)) {
         debug('エラー無し');
@@ -23,45 +24,54 @@ if(!empty($_POST)) {
         validEmail($email, 'email');
         validMinLen($email, 'email');
         validMaxLen($email, 'email');
-        validEmailDup($email);
 
         validMinLen($pass, 'password');
         validMaxLen($pass, 'password');
         validHalf($pass, 'password');
-              
-        validMinLen($pass_re, 'password_re');
-        validMaxLen($pass_re, 'password_re');
 
-        if(empty($err_msg)) {
-            debug('エラー無し2');
-            validMatch($pass,$pass_re,'password_re');
-
-            if(empty($err_msg)){
-                try{
+        if(empty($err_msg)){
+            try{
                     
-                    $dbh = dbConnect();
+                $dbh = dbConnect();
 
-                    $sql = 'INSERT INTO users (eamil, password, create_date) VALUES (:email, :pass, :date)';
-                    $data = array(':email' => $email, ':pass' => $pass, ':date' => date('Y-m-d H:i:s'));
+                $sql = 'SELECT password,id FROM users WHERE eamil = :email AND delete_flg = 0';
+                $data = array(':email' => $email);
 
-                    $stmt = querypost($dbh, $sql, $data);
+                $stmt = querypost($dbh, $sql, $data);
 
-                    if($stmt) {
-                        $sesLimit = 60 * 60;
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+               
+                if(!empty($stmt) && $pass = password_verify($pass, array_shift($result))) {
+                    debug('パスワードマッチ');
 
-                        $_SESSION['login_time'] = time();
-                        $_SESSION['ligin_limit'] = $sesLimit;
+                    $seslimit = 60 * 60;
 
-                        $_SESSION['user_id'] = $dbh->lastInsertId();
+                    $_SESSION['login_date'] = time();
 
-                        debug('セッション変数の中身：'.print_r($_SESSION,true));
+                    if($pass_save) {
+                        debug('ログイン保持がチェック有り');
 
-                        header('Location:index.php');
+                        $_SESSION['login_limit'] = $seslimit * 24 * 30;
+
+                    } else {
+                        debug('ログイン保持チェック無し');
+
+                        $_SESSION['login_limit'] = $seslimit;
                     }
 
-                } catch (Exeption $e) {
-                    error_log('エラー発生'. $e->getMessage());
+                    $_SESSION['user_id'] = $result['id'];
+
+                    debug('セッションの中身'. print_r($_SESSION, true));
+                    header("Location:index.php");
+
+                } else {
+                    debug('パスワードアンマッチ');
+
+                    $err_msg['common'] = MSG09;
                 }
+
+            } catch (Exeption $e) {
+                error_log('エラー発生'. $e->getMessage());
             }
         }
     }
@@ -72,7 +82,7 @@ if(!empty($_POST)) {
 <html lang="ja">
 
 <?php
-    $title = '新規登録';
+    $title = 'ログイン';
     require('head.php');
 ?>
 
@@ -117,11 +127,8 @@ if(!empty($_POST)) {
             <?php echo getErrMsg('password'); ?>
         </div>
 
-        <label for="" class="label">password_re</label>
-        <input type="text" class="input" name="password_re">
-        <div class="msg-area">
-            <?php echo getErrMsg('password_re'); ?>
-        </div>
+        <label for="" class="label">ログイン保持</label>
+        <input type="checkbox" class="input" name="pass_save">
         
         <input type="submit" value="送信">
     </form>

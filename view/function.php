@@ -19,10 +19,11 @@ function debugLogStart() {
   debug('セッションID'.session_id());
   debug('セッション変数の中身'.print_r($_SESSION,true));
   debug('現在日時'.time());
-  if(!empty($_SESSION['login_time']) && !empty($_SESSION['login_limit'])) {
-    debug('ログイン期限日時タイムスタンプ' .($_SESSION['login_time'] + $_SESSION['login_limit']) );
+  if(!empty($_SESSION['login_date']) && !empty($_SESSION['login_limit'])) {
+    debug('ログイン期限日時タイムスタンプ' .($_SESSION['login_date'] + $_SESSION['login_limit']) );
   }
 }
+
 //====================================
 //      セッション準備・有効期限設定
 //====================================
@@ -43,14 +44,16 @@ $err_msg = array();
 //====================================
 //     メッセージ定数
 //====================================
-define('MSG01','入力必須です');
-define('MSG02','email形式で入力してください');
-define('MSG03','パスワード(再入力)が合っていません');
-define('MSG04','半角英数字で入力してください');
-define('MSG05','６文字以上で入力してください');
-define('MSG06','256文字以内で入力してください');
-define('MSG07','エラーが発生しました。しばらく経ってからやり直してください');
-define('MSG08','そのEmailは既に登録されています');
+define('MSG01', '入力必須です');
+define('MSG02', 'email形式で入力してください');
+define('MSG03', 'パスワード(再入力)が合っていません');
+define('MSG04', '半角英数字で入力してください');
+define('MSG05', '６文字以上で入力してください');
+define('MSG06', '256文字以内で入力してください');
+define('MSG07', 'エラーが発生しました。しばらく経ってからやり直してください');
+define('MSG08', 'そのEmailは既に登録されています');
+define('MSG09', 'メールアドレスかパスワードが間違っています');
+
 //====================================
 //     データベース接続・SQL
 //====================================
@@ -158,3 +161,80 @@ function validMinLen($str, $key, $min = 6){
       return $err_msg[$key];
     }
   }
+
+//====================================
+//     データベース関数
+//====================================
+//プロフィール取得//
+function getUserData($u_id) {
+  global $err_msg;
+
+  try {
+
+    $dbh = dbConnect();
+
+    $sql ='SELECT first_name, last_name, eamil, pic, twitter_id FROM users WHERE id = :u_id AND delete_flg = 0';
+    $data =array(':u_id' => $u_id);
+
+    $stmt = querypost($dbh, $sql, $data);
+
+    if(!empty($stmt)) {
+
+      $result = $stmt->fetch(PDO::FETCH_ASSOC);
+      debug('クエリ結果：'. print_r($result, true));
+
+      return $result;
+
+    } else {
+      return false;
+    }
+
+  } catch (Exeption $e) {
+    error_log('エラーが発生しました：'. $e->getMessage());
+    $err_msg['common'] = MSG07;
+  }
+}
+//サニタイズ//
+function sanitize($str) {
+  return htmlspecialchars($str, ENT_QUOTES);
+}
+//フォーム入力保持//
+function getFormData($str, $flg = false) {
+  debug('getFormData開始');
+  if($flg) {
+    $method = $_GET;
+  }else {
+    $method = $_POST;
+  }
+  debug('通過');
+  
+  global $dbFormData;
+
+  if(!empty($dbFormData)) {
+    debug('$dbFormData');
+    if(!empty($err_msg[$str])) {
+      //エラーがあった時
+      if(isset($method[$str])) {
+        return sanitize($method[$str]);
+      } else {
+        return sanitize($dbFormData[$str]);
+      }
+      //エラーが無かった時
+    } else {
+      debug('エラー無し');
+      if(isset($method[$str]) && $method[$str] !== $dbFormData[$str]) {
+        return sanitize($method[$str]);
+      } else {
+        return sanitize($dbFormData[$str]);
+      }
+
+    }
+    //ユーザー情報自体が無かった時
+  } else {
+
+    if(isset($method[$str])) {
+      return sanitize($method[$str]);
+    }
+
+  }
+}
