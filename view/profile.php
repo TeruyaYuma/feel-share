@@ -30,7 +30,7 @@ require('head.php');
 <?php echo $formData['last_name']; ?>
 </div>
 <div>
-<?php echo $formData['eamil']; ?>
+<?php echo $formData['email']; ?>
 </div>
 </main>
 

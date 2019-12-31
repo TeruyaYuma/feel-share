@@ -110,7 +110,7 @@ function validEmailDup($email){
       
       $dbh = dbConnect();
       
-      $sql = 'SELECT count(*) FROM users WHERE eamil = :email AND delete_flg = 0';
+      $sql = 'SELECT count(*) FROM users WHERE email = :email AND delete_flg = 0';
       $data = array(':email' => $email);
       
       $stmt = queryPost($dbh, $sql, $data);
@@ -173,7 +173,7 @@ function getUserData($u_id) {
 
     $dbh = dbConnect();
 
-    $sql ='SELECT first_name, last_name, eamil, pic, twitter_id FROM users WHERE id = :u_id AND delete_flg = 0';
+    $sql ='SELECT first_name, last_name, email, pic, twitter_id FROM users WHERE id = :u_id AND delete_flg = 0';
     $data =array(':u_id' => $u_id);
 
     $stmt = querypost($dbh, $sql, $data);

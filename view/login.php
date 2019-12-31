@@ -34,7 +34,7 @@ if(!empty($_POST)) {
                     
                 $dbh = dbConnect();
 
-                $sql = 'SELECT password,id FROM users WHERE eamil = :email AND delete_flg = 0';
+                $sql = 'SELECT password,id FROM users WHERE email = :email AND delete_flg = 0';
                 $data = array(':email' => $email);
 
                 $stmt = querypost($dbh, $sql, $data);

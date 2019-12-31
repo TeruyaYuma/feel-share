@@ -51,7 +51,7 @@ if(!empty($_POST)) {
                     
                     $dbh = dbConnect();
 
-                    $sql = 'INSERT INTO users (first_name, last_name, eamil, password, create_date) VALUES (:first_name, :last_name, :email, :pass, :date)';
+                    $sql = 'INSERT INTO users (first_name, last_name, email, password, create_date) VALUES (:first_name, :last_name, :email, :pass, :date)';
                     $data = array(':first_name' => $firstName, ':last_name' => $lastName, ':email' => $email, 
                                   ':pass' => password_hash($pass, PASSWORD_DEFAULT),
                                   ':date' => date('Y-m-d H:i:s'));
