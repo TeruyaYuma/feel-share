@@ -194,6 +194,32 @@ function getUserData($u_id) {
     $err_msg['common'] = MSG07;
   }
 }
+//画像全件取得//
+function getImg() {
+  debug('images全件取得');
+  try{
+    
+    $dbh = dbConnect();
+
+    $sql = 'SELECT id, name, user_id FROM images';
+    $data = array();
+
+    $stmt = querypost($dbh, $sql, $data);
+
+    if(!$stmt){
+      return false;
+    }
+
+    return $stmt->fetchAll();
+
+  } catch (Exeption $e) {
+    error_log('エラーが発生しました：'. $e->getMessage());
+    $err_msg['common'] = MSG07;
+  }
+}
+//====================================
+//     その他
+//====================================
 //サニタイズ//
 function sanitize($str) {
   return htmlspecialchars($str, ENT_QUOTES);
@@ -236,5 +262,51 @@ function getFormData($str, $flg = false) {
       return sanitize($method[$str]);
     }
 
+  }
+}
+//画像アップロード//
+function uploadImg($file, $key) {
+  debug('アップロード関数開始');
+  if(isset($file['error']) && is_int($file['error'])) {
+
+    try {
+
+      switch($file['error']) {
+        case UPLOAD_ERR_OK:
+        break;
+        case UPLOAD_ERR_NO_FILE:
+          throw new RuntimeExeption('ファイルが選択されてません');
+        case UPLOAD_ERR_INI_SIZE:
+          throw new RuntimeExeption('ファイルの最大サイズ超過');
+        case UPLOAD_ERR_FROM_SIZE:
+          throw new RuntimeExeption('ファイルが最大サイズ超過');
+        default:
+          throw new RuntimeExeption('その他のエラーが発生しました');
+      }
+      debug('エラー無し');
+      $type = @exif_imagetype($file['tmp_name']);
+      debug('$type:'.print_r($type, true));
+      if(!in_array($type, [IMAGETYPE_PNG,IMAGETYPE_JPEG,IMAGETYPE_GIF], true)) {
+        throw new RuntimeExeption('画像の形式が違います');
+      }
+
+      $path = '../src/img/'.sha1_file($file['tmp_name']).image_type_to_extension($type);
+      debug('$path:'.print_r($path,true));
+      if(!move_uploaded_file($file['tmp_name'],$path)) {
+        throw new RuntimeExeption('ファイル保存時にエラーが発生しました');
+      }
+
+      $path = substr($path,7);
+
+      chmod($path,0644);
+
+      debug('正常にアップロードされました');
+      return $path;
+
+    } catch (RuntimeExeption $e) {
+      debug($e->getMessage());
+      global $err_msg;
+      $err_msg[$key] = $e->getMessage();
+    }
   }
 }
