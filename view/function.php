@@ -53,6 +53,8 @@ define('MSG06', '256文字以内で入力してください');
 define('MSG07', 'エラーが発生しました。しばらく経ってからやり直してください');
 define('MSG08', 'そのEmailは既に登録されています');
 define('MSG09', 'メールアドレスかパスワードが間違っています');
+define('MSG10', '古いパスワードが違います');
+define('MSG11', '古いパスワードと同じです');
 
 //====================================
 //     データベース接続・SQL
@@ -217,6 +219,28 @@ function getImg() {
     $err_msg['common'] = MSG07;
   }
 }
+
+//====================================
+//     メール
+//====================================
+//メール送信//
+function sendMail($from, $to, $subject, $comment) {
+  if(!empty($to) && !empty($subject) && !empty($comment)) {
+
+    mb_language("Jpanese");
+    mb_internal_encoding("UTF-8");
+
+    $result = mb_send_mail($to, $subject, $comment, 'From:'.$from);
+
+    if($result) {
+      debug('メールを送信しました');
+    } else {
+      debug('送信を失敗しました');
+    }
+
+  }
+}
+
 //====================================
 //     その他
 //====================================
