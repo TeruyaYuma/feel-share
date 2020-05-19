@@ -90,35 +90,79 @@ require('head.php');
 ?>
 
 <body>
-<head></head>
-<main>
-    <form action="" method="POST" class="form">
-        <div class="msg-area">
-            <?php echo getErrMsg('common'); ?>
+    <header class="l-header header header--fix isHeaderColor" id="header">
+        <h1><a href="./index.php" class="header__title">FEEL_SHARE</a></h1>
+
+        <nav class="nav-menu">
+            <ul class="nav-menu__menu">
+                <li class="nav-menu__list-item"><a href="./index.php">ホーム</a></li>
+                <?php
+                    if(empty($_SESSION['user_id'])){
+                ?>
+                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link">登録</a></li>
+                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link">ログイン</a></li>
+                <?php
+                    } else {
+                ?>
+                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link">ログアウト</a></li>
+                    <li class="nav-menu__list-item"><a href="./myPage.php" class="nav-menu__list-link">マイページ</a></li>
+                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link btn btn--header">アップロード</a></li>
+                <?php
+                    }
+                ?>
+            </ul>
+        </nav>
+
+    </header>
+    <!-- header -->
+    <main>
+        <div class="l-form modal modal--backgroundImg">
+            <div class="container container--s">
+
+                <form action="" method="POST" class="form mt100">
+
+                    <h2 class="form__title">パスワード変更</h2>
+
+                    <div class="msg-area">
+                        <?php echo getErrMsg('common'); ?>
+                    </div>
+
+                    <label for="" class="label">
+                    古いパスワード
+                    <input type="text" name="pass_old" class="input input--form" value="<?php echo sanitize( getFormData('pass_old') );?>">
+                    </label>
+                    <div class="msg-area">
+                        <?php echo getErrMsg('pass_old'); ?>
+                    </div>
+
+                    <label for="" class="label">
+                    新しいパスワード
+                    <input type="text" name="pass_new" class="input input--form" value="<?php echo sanitize( getFormData('pass_new') );?>">
+                    </label>
+                    <div class="msg-area">
+                        <?php echo getErrMsg('pass_new'); ?>
+                    </div>
+
+                    <label for="" class="label">
+                    新しいパスワード（再入力）
+                    <input type="text" name="pass_new_re" class="input input--form">
+                    </label>
+                    <div class="msg-area">
+                        <?php echo getErrMsg('pass_new_re'); ?>
+                    </div>
+
+                    <input type="submit" class="btn btn--form">
+
+                </form>
+
+            </div>
         </div>
-        <label for="" class="label">
-        古いパスワード
-        <input type="text" style="display:block;" name="pass_old" class="input">
-        </label>
-        <div class="msg-area">
-            <?php echo getErrMsg('pass_old'); ?>
-        </div>
-        <label for="" class="label">
-        新しいパスワード
-        <input type="text" style="display:block;" name="pass_new" class="input">
-        </label>
-        <div class="msg-area">
-            <?php echo getErrMsg('pass_new'); ?>
-        </div>
-        <label for="" class="label">
-        新しいパスワード（再入力）
-        <input type="text" style="display:block;" name="pass_new_re" class="input">
-        </label>
-        <div class="msg-area">
-            <?php echo getErrMsg('pass_new_re'); ?>
-        </div>
-        <input type="submit" class="">
-    </form>
-</main>
+    </main>
+
+    <footer id="footer" class="l-footer js-footer">
+    Copryright&copy; U
+    </footer>
+<!-- footer -->
+<script src="../dist/js/bundle.js"></script>
 </body>
 </html>

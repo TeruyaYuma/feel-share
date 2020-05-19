@@ -8,19 +8,26 @@ debugLogStart();
 
 require('auth.php');
 
+//ランダム背景イメージ取得//
+$randomImages = getRandomImage();
+debug('$randomImages:'.print_r($randomImages,true));
+
 if(!empty($_POST)) {
     debug('POSTされました。');
 
     $email = $_POST['email'];
     $pass = $_POST['password'];
     $pass_save = !empty($_POST['pass_save']) ? $_POST['pass_save'] : '';
-
+    //validRequire: 空値チェック//
     validRequire($email, 'email');
     validRequire($pass, 'password');
 
     if(empty($err_msg)) {
         debug('エラー無し');
-
+        /* validMinLen: 最大文字数チェック
+           validMaxLen: 最小文字数チェック
+           validHalf:   半角英数字チェック
+           validEmail:  dbEmailチェック */
         validEmail($email, 'email');
         validMinLen($email, 'email');
         validMaxLen($email, 'email');
@@ -40,8 +47,8 @@ if(!empty($_POST)) {
                 $stmt = querypost($dbh, $sql, $data);
 
                 $result = $stmt->fetch(PDO::FETCH_ASSOC);
-               
-                if(!empty($stmt) && $pass = password_verify($pass, array_shift($result))) {
+                //ポストされたパスワードと取得したDBのパスワードが合致すればログインタイム設定して繊維//
+                if(!empty($stmt) && password_verify($pass, array_shift($result))) {
                     debug('パスワードマッチ');
 
                     $seslimit = 60 * 60;
@@ -86,56 +93,67 @@ if(!empty($_POST)) {
     require('head.php');
 ?>
 
-<style>
-    .form {
-        width: 50%;
-    }
-    .input {
-        margin-bottom: 20px;
-        width : 100%;
-    }
-    .input--half {
-        display: inline-block;
-        width: 40%;
-    }
-    .label {
-        display: block;
-    }
-    .label--half {
-        margin-right: 20px;
-        display: inline-block;
-    }
-
-</style>
 <body>
-<header></header>
-<main>
-    <form action="" class="form" method="POST">
-        <div class="msg-area">
-            <?php echo getErrMsg('common'); ?>
-        </div>
 
-        <label for="" class="label">email</label>
-        <input type="text" class="input" name="email">
-        <div class="msg-area">
-            <?php echo getErrMsg('email'); ?>
-        </div>
+    <header class="l-header header header--fix" id="header">
+        <h1><a href="" class="header__title">FEEL_SHARE</a></h1>
+        <nav class="nav-menu">
+        <ul class="nav-menu__menu">
+            <li class="nav-menu__list-item">登録してるならコチラ ＞＞</li>
+            <li class="nav-menu__list-item">
+                <a href="./signup.php" class="nav-menu__list-link btn btn--header">サインアップ</a>
+            </li>
+        </ul>
+    </nav>
+    </header>
+    <!-- ヘッダー -->
+    <main id="main"> 
+        <section class="container container--l-img">
+            <div class="image mt">
+                <?php
+                    foreach($randomImages as $val){
+                ?>
+                    <img src="<?php echo sanitize('../dist/'.$val['name']); ?>" alt="" class="image__item">
+                <?php
+                    }
+                ?>
+            </div>
+        </section>
+        <!-- ランダムイメージ背景 -->
+        <section class="l-form modal modal--backgroundImg">
+            <div class="container container--s">
+                <form action="" class="form mt220" method="POST">
 
-        <label for="" class="label">password</label>
-        <input type="text" class="input" name="password">
-        <div class="msg-area">
-            <?php echo getErrMsg('password'); ?>
-        </div>
+                    <h1 class="form__title">login</h1>
 
-        <label for="" class="label">ログイン保持</label>
-        <input type="checkbox" class="input" name="pass_save">
-        
-        <input type="submit" value="送信">
-    </form>
-</main>
+                    <div class="msg-area">
+                        <?php echo getErrMsg('common'); ?>
+                    </div>
+
+                    <label for="" class="label">email</label>
+                    <input type="text" class="input input--form" name="email" value="<?php echo sanitize(getFormData('email')); ?>">
+                    <div class="msg-area">
+                        <?php echo getErrMsg('email'); ?>
+                    </div>
+
+                    <label for="" class="label">password</label>
+                    <input type="text" class="input input--form" name="password" value="<?php echo sanitize(getFormData('password')); ?>">
+                    <div class="msg-area">
+                        <?php echo getErrMsg('password'); ?>
+                    </div>
+
+                    <label for="" class="label">ログイン保持</label>
+                    <input type="checkbox" class="input" name="pass_save">
+                    
+                    <input type="submit" value="送信" class="btn btn--form">
+                </form>
+            </div>
+        </section>
+        <!-- フォーム -->
+    </main>
     
 
-    <script src="dist/js/bundle.js">
+    <script src="../dist/js/bundle.js">
     </script>
 </body>
 </html>

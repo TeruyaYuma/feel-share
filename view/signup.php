@@ -6,6 +6,11 @@ debug('「　ユーザー登録　');
 debug('「「「「「「「「「「「「「「「「「「「「「「「「「「「「「');
 debugLogStart();
 
+//ランダム背景イメージ取得//
+$randomImages = getRandomImage();
+debug('$randomImages:'.print_r($randomImages,true));
+
+
 if(!empty($_POST)) {
     debug('POSTされました。');
 
@@ -14,7 +19,7 @@ if(!empty($_POST)) {
     $email = $_POST['email'];
     $pass = $_POST['password'];
     $pass_re = $_POST['password_re'];
-
+    //validRequire：空チェック//
     validRequire($firstName, 'firstName');
     validRequire($lastName, 'lastName');
     validRequire($email, 'email');
@@ -23,7 +28,11 @@ if(!empty($_POST)) {
 
     if(empty($err_msg)) {
         debug('エラー無し');
-
+        /* validHalf:     半角英数字チェック
+           validMaxLen:   最大文字数チェック
+           validMinLen:   最小文字数チェック
+           validEmail:    Email形式チェック
+           validEmailDup: dbEmailチェック */
         validHalf($firstName, 'firstName');
         validMaxLen($firstName, 'firstName');
 
@@ -44,6 +53,7 @@ if(!empty($_POST)) {
 
         if(empty($err_msg)) {
             debug('エラー無し2');
+            //validMatch:同値チェック//
             validMatch($pass,$pass_re,'password_re');
 
             if(empty($err_msg)){
@@ -51,7 +61,9 @@ if(!empty($_POST)) {
                     
                     $dbh = dbConnect();
 
-                    $sql = 'INSERT INTO users (first_name, last_name, email, password, create_date) VALUES (:first_name, :last_name, :email, :pass, :date)';
+                    $sql = 'INSERT INTO users (first_name, last_name, email, password, create_date)
+                            VALUES (:first_name, :last_name, :email, :pass, :date)';
+
                     $data = array(':first_name' => $firstName, ':last_name' => $lastName, ':email' => $email, 
                                   ':pass' => password_hash($pass, PASSWORD_DEFAULT),
                                   ':date' => date('Y-m-d H:i:s'));
@@ -59,6 +71,7 @@ if(!empty($_POST)) {
                     $stmt = querypost($dbh, $sql, $data);
 
                     if($stmt) {
+                        //ユーザーログインタイムの初期値設定//
                         $sesLimit = 60 * 60;
 
                         $_SESSION['login_date'] = time();
@@ -88,69 +101,90 @@ if(!empty($_POST)) {
     require('head.php');
 ?>
 
-<style>
-    .form {
-        width: 50%;
-    }
-    .input {
-        margin-bottom: 20px;
-        width : 100%;
-    }
-    .input--half {
-        display: inline-block;
-        width: 40%;
-    }
-    .label {
-        display: block;
-    }
-    .label--half {
-        margin-right: 20px;
-        display: inline-block;
-    }
-
-</style>
 <body>
-<header></header>
-<main>
-    <form action="" class="form" method="POST">
-        <div class="msg-area">
-            <?php echo getErrMsg('common'); ?>
-        </div>
-        <label for="" class="label">FirstName</label>
-        <input type="text" class="input input--half" name="firstName">
-        <div class="msg-area">
-            <?php echo getErrMsg('firstName'); ?>
-        </div>
-        <label for="" class="label">lastName</label>
-        <input type="text" class="input--half" name="lastName">
-        <div class="msg-area">
-            <?php echo getErrMsg('lastName'); ?>
-        </div>
 
-        <label for="" class="label">email</label>
-        <input type="text" class="input" name="email">
-        <div class="msg-area">
-            <?php echo getErrMsg('email'); ?>
-        </div>
+    <header class="l-header header header--fix" id="header">
+        <h1><a href="" class="header__title">FEEL_SHARE</a></h1>
 
-        <label for="" class="label">password</label>
-        <input type="text" class="input" name="password">
-        <div class="msg-area">
-            <?php echo getErrMsg('password'); ?>
-        </div>
-
-        <label for="" class="label">password_re</label>
-        <input type="text" class="input" name="password_re">
-        <div class="msg-area">
-            <?php echo getErrMsg('password_re'); ?>
-        </div>
+        <nav class="nav-menu">
+            <ul class="nav-menu__menu">
+                <li class="nav-menu__list-item">登録してるならコチラ ＞＞</li>
+                <li class="nav-menu__list-item">
+                    <a href="./login.php" class="nav-menu__list-link btn btn--header">ログイン</a>
+                </li>
+            </ul>
+        </nav>
         
-        <input type="submit" value="送信">
-    </form>
-</main>
+    </header>
+    <!-- ヘッダー -->
+    <main id="main">
+        <section class="container container--l-img">
+            <div class="image mt">
+                <?php
+                    foreach($randomImages as $val){
+                ?>
+                    <img src="<?php echo sanitize('../dist/'.$val['name']); ?>" alt="" class="image__item">
+                <?php
+                    }
+                ?>
+            </div>
+        </section>
+        <!-- ランダムイメージ背景 -->
+        <section class="l-form modal modal--backgroundImg">
+            <div class="container container--s">
+
+                <form action="" class="form mt220" method="POST">
+                    <h1 class="form__title">sign up</h1>
+
+                    <div class="msg-area">
+                        <?php echo getErrMsg('common'); ?>
+                    </div>
+
+                    <div class="form__half">
+                        <div class="form__half-area">
+                            <label for="" class="label">FirstName</label>
+                            <input type="text" class="input input--form" name="firstName" value="<?php echo sanitize(getFormData('firstName'));?>">
+                            <div class="msg-area">
+                                <?php echo getErrMsg('firstName'); ?>
+                            </div>
+                        </div>
+
+                        <div class="form__half-area">
+                            <label for="" class="label">lastName</label>
+                            <input type="text" class="input input--form" name="lastName" value="<?php echo sanitize(getFormData('lastName'));?>">
+                            <div class="msg-area">
+                                <?php echo getErrMsg('lastName'); ?>
+                            </div>
+                        </div>
+                    </div>
+                        
+                    <label for="" class="label">email</label>
+                    <input type="text" class="input input--form" name="email" value="<?php echo sanitize(getFormData('email'));?>">
+                    <div class="msg-area">
+                        <?php echo getErrMsg('email'); ?>
+                    </div>
+
+                    <label for="" class="label">password</label>
+                    <input type="text" class="input input--form" name="password" value="<?php echo sanitize(getFormData('password'));?>">
+                    <div class="msg-area">
+                        <?php echo getErrMsg('password'); ?>
+                    </div>
+
+                    <label for="" class="label">password_re</label>
+                    <input type="text" class="input input--form" name="password_re" value="<?php echo sanitize(getFormData('password_re'));?>">
+                    <div class="msg-area">
+                        <?php echo getErrMsg('password_re'); ?>
+                    </div>
+                    
+                    <input type="submit" value="送信" class="btn btn--form">
+                </form>
+            </div>
+        </section>
+        <!-- フォーム -->
+    </main>
     
 
-    <script src="dist/js/bundle.js">
+    <script src="../dist/js/bundle.js">
     </script>
 </body>
 </html>

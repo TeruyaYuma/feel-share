@@ -1,8 +1,5 @@
-h1 {
-    color: blue;
-    font-size:60px;
-}
-
-.addClass {
-    color: red;
-}
+@import'./foundation';
+@import'./base';
+@import'./layout';
+@import'./object';
+@import'./utility';

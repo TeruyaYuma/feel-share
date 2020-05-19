@@ -1,0 +1,35 @@
+html, body{
+    width: 100%;
+    font-size: 16px;
+    line-height: 1.6;
+    font-family: -apple-system,BlinkMacSystemFont,segoe ui,roboto,oxygen,cantarell,helvetica neue,ubuntu,sans-serif;
+    text-size-adjust: 100%;
+    letter-spacing: 0.1em;
+} 
+ p,a {
+    -webkit-font-smoothing: antialiased;
+}
+ 
+a{
+    color: #FFF;
+    text-decoration: none;
+    transition: .3s;
+}  
+a:hover {
+    color: #e3a8b1;
+    transition: .3s;
+}  
+img {
+    width: 100%;
+    height: 100%;
+    vertical-align: bottom;
+}
+li{
+    list-style: none;
+}
+input{
+    outline: none;
+ }
+ textarea{
+    outline: none;
+ }

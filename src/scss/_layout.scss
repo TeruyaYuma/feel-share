@@ -1,0 +1,60 @@
+#header{
+    width: 100%;
+}
+#main{
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 10px;
+}
+#footer{
+    width: 100%;
+}
+// wrapper
+.l-wrapper{
+    display: flex;
+    width: 50%;
+    margin-right: auto;
+    margin-left: auto;
+}
+// header
+.l-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 3;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 0 20px;
+}
+// form
+.l-form{
+    width: 100%;
+}
+// search
+.l-search{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    border-bottom: 1px solid gray;
+    background: rgba(5,5,5, .1);
+}
+// hero
+.l-hero{
+    width: 100%;
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    background-position:center center;
+    background-attachment: fixed;
+    width: 100%;
+    height: 700px;
+}
+//footer
+.l-footer{
+    background:#333;
+    text-align: center;
+    padding: 15px 0;
+    color: #fff;
+}
+
