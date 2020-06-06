@@ -78,6 +78,7 @@ if(!empty($_POST)) {
                         $_SESSION['login_limit'] = $sesLimit;
 
                         $_SESSION['user_id'] = $dbh->lastInsertId();
+                        $_SESSION['msg_success'] = SUC02;
 
                         debug('セッション変数の中身：'.print_r($_SESSION,true));
 
@@ -102,9 +103,41 @@ if(!empty($_POST)) {
 ?>
 
 <body>
+    <header class="l-header header js-header" id="header">
+        <h1><a href="./index.php" class="header__title">FEEL_SHARE</a></h1>
 
-    <header class="l-header header header--fix" id="header">
-        <h1><a href="" class="header__title">FEEL_SHARE</a></h1>
+        <div class="menu-trigger js-toggle-sp-menu">
+            <span class="menu-trigger__item"></span>
+            <span class="menu-trigger__item"></span>
+            <span class="menu-trigger__item"></span>
+        </div>
+
+        <nav class="nav-menu js-toggle-sp-menu-target">
+            <ul class="nav-menu__menu">
+                <li class="nav-menu__list-item"><a href="./index.php" class="nav-menu__list-link">ホーム</a></li>
+                <?php
+                    if(empty($_SESSION['user_id'])){
+                ?>
+                    <li class="nav-menu__list-item"><a href="./signup.php" class="nav-menu__list-link">サインアップ</a></li>
+                    <li class="nav-menu__list-item"><a href="./login.php" class="nav-menu__list-link">ログイン</a></li>
+                    <li class="nav-menu__list-item"><a href="./contact.php" class="nav-menu__list-link">お問い合わせ</a></li>
+                    <li class="nav-menu__list-item"><a href="./imgUpload.php" class="nav-menu__list-link btn btn--header">アップロード</a></li>
+                <?php
+                    } else {
+                ?>
+                    <li class="nav-menu__list-item"><a href="./logout.php" class="nav-menu__list-link">ログアウト</a></li>
+                    <li class="nav-menu__list-item"><a href="./myPage.php" class="nav-menu__list-link">マイページ</a></li>
+                    <li class="nav-menu__list-item"><a href="./contact.php" class="nav-menu__list-link">お問い合わせ</a></li>
+                    <li class="nav-menu__list-item"><a href="./imgUpload.php" class="nav-menu__list-link btn btn--header">アップロード</a></li>
+                <?php
+                    }
+                ?>
+            </ul>
+        </nav>
+
+    </header>
+    <!-- <header class="l-header header" id="header">
+        <h1><a href="./index.php" class="header__title">FEEL_SHARE</a></h1>
 
         <nav class="nav-menu">
             <ul class="nav-menu__menu">
@@ -115,15 +148,17 @@ if(!empty($_POST)) {
             </ul>
         </nav>
         
-    </header>
+    </header> -->
     <!-- ヘッダー -->
     <main id="main">
         <section class="container container--l-img">
-            <div class="image mt">
+            <div class="image image--s">
                 <?php
                     foreach($randomImages as $val){
                 ?>
-                    <img src="<?php echo sanitize('../dist/'.$val['name']); ?>" alt="" class="image__item">
+                    <div class="image__item-s image__item-s--high">
+                        <img src="<?php echo sanitize('../dist/'.$val['name']); ?>" alt="">
+                    </div>
                 <?php
                     }
                 ?>

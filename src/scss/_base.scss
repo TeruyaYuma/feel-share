@@ -1,8 +1,8 @@
 html, body{
     width: 100%;
-    font-size: 16px;
+    font-size: $font-size_default;
     line-height: 1.6;
-    font-family: -apple-system,BlinkMacSystemFont,segoe ui,roboto,oxygen,cantarell,helvetica neue,ubuntu,sans-serif;
+    font-family: $font-family_default;
     text-size-adjust: 100%;
     letter-spacing: 0.1em;
 } 
@@ -11,14 +11,9 @@ html, body{
 }
  
 a{
-    color: #FFF;
     text-decoration: none;
     transition: .3s;
-}  
-a:hover {
-    color: #e3a8b1;
-    transition: .3s;
-}  
+}
 img {
     width: 100%;
     height: 100%;

@@ -2,7 +2,7 @@
 header("Content-type: application/json; charset=utf-8");
 
 if(!empty($_GET)) {
-    
+
     $dsn = 'mysql:dbname=feel_share;host=localhost;charset=utf8';
     $user = 'root';
     $password = 'Yuma@19860120';

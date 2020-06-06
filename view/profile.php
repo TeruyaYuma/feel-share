@@ -77,33 +77,33 @@ $title = 'プロフィール';
 require('head.php');
 ?>
 
-<style>
-
-.mt200{
-    margin-top: 200px;
-}
-.mt100{
-    margin-top: 100px;
-}
-</style>
 <body>
-    <header class="l-header header header--fix isHeaderColor" id="header">
+    <header class="l-header header header--bgColor" id="header">
         <h1><a href="./index.php" class="header__title">FEEL_SHARE</a></h1>
 
-        <nav class="nav-menu">
+        <div class="menu-trigger js-toggle-sp-menu">
+            <span class="menu-trigger__item"></span>
+            <span class="menu-trigger__item"></span>
+            <span class="menu-trigger__item"></span>
+        </div>
+
+        <nav class="nav-menu js-toggle-sp-menu-target">
             <ul class="nav-menu__menu">
-                <li class="nav-menu__list-item"><a href="./index.php">ホーム</a></li>
+                <li class="nav-menu__list-item"><a href="./index.php" class="nav-menu__list-link">ホーム</a></li>
                 <?php
                     if(empty($_SESSION['user_id'])){
                 ?>
-                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link">登録</a></li>
-                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link">ログイン</a></li>
+                    <li class="nav-menu__list-item"><a href=".signup.php" class="nav-menu__list-link">登録</a></li>
+                    <li class="nav-menu__list-item"><a href="./login.php" class="nav-menu__list-link">ログイン</a></li>
+                    <li class="nav-menu__list-item"><a href="./contact.php" class="nav-menu__list-link">お問い合わせ</a></li>
+                    <li class="nav-menu__list-item"><a href="./imgUpload.php" class="nav-menu__list-link btn btn--header">アップロード</a></li>
                 <?php
                     } else {
                 ?>
-                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link">ログアウト</a></li>
+                    <li class="nav-menu__list-item"><a href="./logout.php" class="nav-menu__list-link">ログアウト</a></li>
                     <li class="nav-menu__list-item"><a href="./myPage.php" class="nav-menu__list-link">マイページ</a></li>
-                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link btn btn--header">アップロード</a></li>
+                    <li class="nav-menu__list-item"><a href="./contact.php" class="nav-menu__list-link">お問い合わせ</a></li>
+                    <li class="nav-menu__list-item"><a href="./imgUpload.php" class="nav-menu__list-link btn btn--header">アップロード</a></li>
                 <?php
                     }
                 ?>
@@ -123,46 +123,44 @@ require('head.php');
 
                     <div class="profile__detail">
 
-                        <div class="profile__info">
-                            <h2 class="profile__name"><?php echo sanitize($userName); ?></h2>
-
-                            <?php if( !empty($_SESSION['user_id']) && $_SESSION['user_id'] === $u_id ){ ?>
-
-                                <div class="btn btn--msg"><a href="./myPage.php">マイページ</a></div>
-
-                            <?php } else { ?>
-
-                                <form action="" method="POST">
-                                    <input type="submit" value="メッセージ" name="submit" class="btn btn--msg">
-                                </form>
-
-                            <?php } ?>
-                        </div>
+                        <h2 class="profile__name"><?php echo sanitize($userName); ?></h2>
 
                         <div class="profile__social">
-                            <i class="profile__social-icn">🐤</i><span>U@WEB</span>
+                        <i class="fab fa-twitter-square profile__social-icon" aria-hidden="true"></i><span>U@WEB</span>
                         </div>
 
+                        <?php if( !empty($_SESSION['user_id']) && $_SESSION['user_id'] === $u_id ){ ?>
+
+                            
+                            <a href="./myPage.php" class="btn btn--link">マイページ</a>
+                            
+
+                        <?php } else { ?>
+
+                            <form action="" method="POST">
+                                <input type="submit" value="メッセージ" name="submit" class="btn btn--link">
+                            </form>
+
+                        <?php } ?>
+                        
                     </div>
 
                 </div>
         </section>
         
-        <section class="image mt100">
-                <div class="image__head">
-                    <h2 class="image__title">投稿画像</h2>
-                    <span class="image__total">投稿数：125枚</span>
+        <section class="image-container mt100">
+                <div class="image-container__head">
+                    <h2 class="image-container__title">投稿画像</h2>
+                    <span class="image-container__total">投稿数: <?php echo count($images); ?> 件</span>
                 </div>
                 
-                <div class="bg-image">
+                <div class="image image--m">
                     <?php
                         if(!empty($images)){
                             foreach($images as $val){
                     ?>
-                    <div class="bg-image__item">
-                        <a href="imgUpload.php?i_id=<?php echo sanitize($val['id']); ?>">
-                            <img src="../dist/<?php echo showImg( sanitize($val['name']) ); ?>" alt="" style="width: 100%;">
-                        </a>
+                    <div class="image__item-m">
+                        <img src="../dist/<?php echo showImg( sanitize($val['name']) ); ?>" alt="">
                     </div>
                     <?php
                             }

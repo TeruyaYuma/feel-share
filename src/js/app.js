@@ -13,10 +13,10 @@ $(function(){
 
         var index = $('.js-tab li').index(this);
         
-        $('.js-tab li').removeClass('is-active');
-        $(this).addClass('is-active');
+        $('.js-tab li').removeClass('isActive');
+        $(this).addClass('isActive');
 
-        $('.js-tab-content').removeClass('is-show').eq(index).addClass('is-show');
+        $('.js-tab-content').removeClass('isNone').eq(index).addClass('isNone');
         
     });
 
@@ -35,7 +35,7 @@ $(function(){
     
     //footer固定
     var $ftr = $('.js-footer');
-    
+
     if($ftr.length > 0){
         if( window.innerHeight > $ftr.offset().top + $ftr.outerHeight() ){
         $ftr.attr({'style': 'position:fixed; top:' + (window.innerHeight - $ftr.outerHeight()) + 'px;' });
@@ -45,6 +45,44 @@ $(function(){
         $(this).toggleClass('addClass');
     });
 
+    // header固定
+    var $win = $(window),
+        $header = $('.js-header');
+
+        if($header.length){
+            var navPos = $header.offset().top;
+        }
+        
+        $win.on('scroll', function(){
+            var value = $(this).scrollTop();
+            if(value > navPos){
+                $header.addClass('isHeaderColor');
+            } else {
+                $header.removeClass('isHeaderColor');
+            }
+        });
+    
+    //tggleSpMenu
+    var $jsToggleMenu = $('.js-toggle-sp-menu');
+    var $jsToggleMenuTarget = $('.js-toggle-sp-menu-target');
+
+    $jsToggleMenu.on('click', function(){
+        $(this).toggleClass('active');
+        $jsToggleMenuTarget.toggleClass('active');
+    });
+    $jsToggleMenuTarget.on('click', function(){
+        $(this).removeClass('active');
+        $jsToggleMenu.removeClass('active');
+    });
+
+    // toggleメッセージ
+    var $jsShowMsg = $('.js-show-msg');
+    var msg = $jsShowMsg.text();
+
+    if(msg.replace(/^[\s　]+|[\s　]+$/g, "").length){
+        $jsShowMsg.slideToggle('slow');
+        setTimeout(function(){ $jsShowMsg.slideToggle('slow'); }, 5000);
+    }
     //画像プレビュー
     var $dropArea = $('.js-drop-area');
     var $file = $('.js-file');
@@ -191,12 +229,75 @@ $(function(){
             console.log(data);
             console.log('AjaxSuccess');
 
-            if(data !== ''){
+            if(data !== 'false'){
                 $this.toggleClass('active');
+            } else {
+                window.location.href = './login.php';
             }
+
         }, function( msg ){
             console.log('AjaxFails');
         });
     });
+    // sp用 もっと見るボタン
+    var moreNum = 4;
+    $('.image .js-slideDown:nth-child(n + ' + (moreNum + 1) + ')').addClass('isHidden');
 
+    $('.js-more').on('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        $('.image .image__item-s.isHidden').slice(0, moreNum).removeClass('isHidden');
+
+        if ($('.image .image__item-s.isHidden').length == 0) {
+        $('.js-more').fadeOut();
+        }        
+    });
+
+    // フェイドイメージ
+    $(function() {
+         
+        var imgBox = $('.js-crossFade');
+        var fadeSpeed = 6000;
+        var switchDelay = 8000;
+         
+        imgBox.find('li').hide();
+        imgBox.find('li:first').stop().fadeIn(fadeSpeed);
+     
+        setInterval(function(){
+            imgBox.find('li:first-child').fadeOut(fadeSpeed)
+            .next('li').fadeIn(fadeSpeed)
+            .end().appendTo(imgBox);
+        },switchDelay);
+         
+    });
+
+    // アイコンアニメーション
+    $('.js-click-animation').on('click', function(){
+        var $this = $(this);
+
+        $this.toggleClass('far');
+        $this.toggleClass('fas');
+        $this.toggleClass('is-active');
+
+        if(!$this.parent().hasClass('active')){
+            $('.js-click-animation2').addClass('is-active');   
+        }
+    });
+
+    
+    var hasActive = function(){
+        if( $('.js-heart').hasClass('active') ){
+            var activeIcn = $('.js-heart.active').children('.js-click-animation');
+    
+            activeIcn.removeClass('far');
+            activeIcn.addClass('fas');
+            activeIcn.addClass('is-active');
+        }
+    }
+    hasActive();
+    
 });
+
+
+

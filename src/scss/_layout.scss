@@ -3,8 +3,6 @@
 }
 #main{
     width: 100%;
-    box-sizing: border-box;
-    padding: 0 10px;
 }
 #footer{
     width: 100%;
@@ -15,16 +13,26 @@
     width: 50%;
     margin-right: auto;
     margin-left: auto;
+    @include mq(){
+        display: block;
+        width: 100%;
+    }
+}
+//main
+.l-main{
+    box-sizing: border-box;
+    padding: 0 $space_m;
 }
 // header
 .l-header{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 3;
-    text-align: center;
     box-sizing: border-box;
-    padding: 0 20px;
+    padding: 0 $space_xl;
+    @include mq(){
+        padding: initial;
+    }
 }
 // form
 .l-form{
@@ -36,25 +44,20 @@
     display: flex;
     justify-content: center;
     box-sizing: border-box;
-    margin-bottom: 20px;
+    margin-bottom: $space_xl;
     border-bottom: 1px solid gray;
-    background: rgba(5,5,5, .1);
+    background: rgba($color_dark, .1);
 }
 // hero
 .l-hero{
-    width: 100%;
-    background-size: 100% auto;
-    background-repeat: no-repeat;
-    background-position:center center;
-    background-attachment: fixed;
     width: 100%;
     height: 700px;
 }
 //footer
 .l-footer{
-    background:#333;
+    background:$color_default;
     text-align: center;
-    padding: 15px 0;
-    color: #fff;
+    padding: $space_l 0;
+    color: $font-color_default;
 }
 

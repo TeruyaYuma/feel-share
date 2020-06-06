@@ -9,7 +9,10 @@ debugLogStart();
 
 $currentPageNum = (!empty($_GET['p']))? $_GET['p'] : 1;
 debug('p'.(int)$currentPageNum);
-
+$category = (!empty($_GET['category']))? $_GET['category'] : '';
+debug('c'.(int)$category);
+$sort = (!empty($_GET['sort']))? $_GET['sort'] : 1;
+debug('p'.(int)$sort);
 if( !empty($currentPageNum) && (int)$currentPageNum <= 0 ) {
     error_log('エラー発生：指定ページに不正な値が入りました。');
     header("Location:index.php");
@@ -18,14 +21,10 @@ if( !empty($currentPageNum) && (int)$currentPageNum <= 0 ) {
 
 $listSpan = 9;
 
-$category = (!empty($_GET['category']))? $_GET['category'] : '';
-
-$sort = (!empty($_GET['sort']))? $_GET['sort'] : '';
-
-$currentMinNum = (($currentPageNum - 1) * $listSpan);
+$currentMinNum = (((int)$currentPageNum - 1) * $listSpan);
 
 $images = getImgList($currentMinNum, $category, $sort);
-$heroImg = getRandomImage(1);
+$heroImg = getRandomImage(4);
 debug('$freeWord:'.$category);
 debug('$order:'.$sort);
 debug('$images:'. print_r($images,true));
@@ -33,51 +32,47 @@ debug('$heroImg:'.print_r($heroImg[0]['name'],true));
 ?>
 <!DOCTYPE html>
 <html lang="ja">
+
 <?php
     $title = 'メインページ';
     require('head.php');
 ?>
-
+<?php 
+// echo '../dist/'.$heroImg[0]['name']; 
+?>
 <style>
- /* image */
- 
- /* modal */
-
-.isOpen{
-    display: block;
-}
-.active{
-    color: red;
-}
-/* hero */
 .l-hero{
-    background-image: url('<?php echo '../dist/'.$heroImg[0]['name']; ?>');
-}
-/* ///////////// 
-     utility
-///////////// */
-.mt50{
-    margin-top: 50px;
+    /* background-image: url(''); */
 }
 </style>
+
 <body>
-    <header class="l-header header header--fix" id="header">
+    <header class="l-header header js-header" id="header">
         <h1><a href="./index.php" class="header__title">FEEL_SHARE</a></h1>
 
-        <nav class="nav-menu">
+        <div class="menu-trigger js-toggle-sp-menu">
+            <span class="menu-trigger__item"></span>
+            <span class="menu-trigger__item"></span>
+            <span class="menu-trigger__item"></span>
+        </div>
+
+        <nav class="nav-menu js-toggle-sp-menu-target">
             <ul class="nav-menu__menu">
-                <li class="nav-menu__list-item"><a href="./index.php">ホーム</a></li>
+                <li class="nav-menu__list-item"><a href="./index.php" class="nav-menu__list-link">ホーム</a></li>
                 <?php
                     if(empty($_SESSION['user_id'])){
                 ?>
-                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link">登録</a></li>
-                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link">ログイン</a></li>
+                    <li class="nav-menu__list-item"><a href="./signup.php" class="nav-menu__list-link">サインアップ</a></li>
+                    <li class="nav-menu__list-item"><a href="./login.php" class="nav-menu__list-link">ログイン</a></li>
+                    <li class="nav-menu__list-item"><a href="./contact.php" class="nav-menu__list-link">お問い合わせ</a></li>
+                    <li class="nav-menu__list-item"><a href="./imgUpload.php" class="nav-menu__list-link btn btn--header">アップロード</a></li>
                 <?php
                     } else {
                 ?>
-                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link">ログアウト</a></li>
+                    <li class="nav-menu__list-item"><a href="./logout.php" class="nav-menu__list-link">ログアウト</a></li>
                     <li class="nav-menu__list-item"><a href="./myPage.php" class="nav-menu__list-link">マイページ</a></li>
-                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link btn btn--header">アップロード</a></li>
+                    <li class="nav-menu__list-item"><a href="./contact.php" class="nav-menu__list-link">お問い合わせ</a></li>
+                    <li class="nav-menu__list-item"><a href="./imgUpload.php" class="nav-menu__list-link btn btn--header">アップロード</a></li>
                 <?php
                     }
                 ?>
@@ -85,8 +80,22 @@ debug('$heroImg:'.print_r($heroImg[0]['name'],true));
         </nav>
 
     </header>
+
+    <p class="msg-slide js-show-msg" style="display: none;">
+        <?php echo getSessionFlash('msg_success'); ?>
+    </p>
+
     <!-- header -->
-    <section class="l-hero">
+    <section class="l-hero hero">
+        <ul class="hero__crossFade-list js-crossFade">
+            <?php
+                foreach($heroImg as $val){
+            ?>
+            <li class="hero__crossFade-item" style="background-image: url('<?php echo '../dist/'.$val['name']; ?>');"></li>
+            <?php
+                }
+            ?>
+        </ul>
         <div class="modal modal--hero">
             <h1 class="hero__title">FEEL <br>SO GOOD</h1>
         </div>
@@ -94,12 +103,12 @@ debug('$heroImg:'.print_r($heroImg[0]['name'],true));
     <!-- hero -->
     <section class="l-search search">
         <div class="search__body">
-            <form action="" method="GET">
+            <form action="" method="get">
 
                 <input type="text" name="category" class="input input--search" placeholder="freeword検索">
                 <select name="sort" class="input input--search-select" id="">
-                    <option value="0">新しい順</option>
-                    <option value="1">古い順</option>
+                    <option value="1" <?php if(getFormData('sort',true) == 1 ){ echo 'selected'; }?>>新しい順</option>
+                    <option value="2" <?php if(getFormData('sort',true) == 2 ){ echo 'selected'; }?>>古い順</option>
                 </select>
 
                 <input type="submit" class="btn btn--search" value="検索">
@@ -154,22 +163,26 @@ debug('$heroImg:'.print_r($heroImg[0]['name'],true));
         </div>
         <!-- modal -->
         <div class="container container--l">
-
-            <h2 class="container__title">画像一覧</h2>
             
-            <div class="bg-image">
+            <div class="container__head">
+                <h2 class="container__title">画像一覧</h2>
+                <p><span><?php echo (!empty($images['data'])) ? $currentMinNum+1 : 0; ?></span> - <span><?php echo $currentMinNum + count($images['data']);?></span>件 / <span><?php echo sanitize($images['total']); ?>件中</span></p>
+            </div>
+            <div class="image image--m">
                 <?php
                 if($images['data']){
                     foreach($images['data'] as $val){
                 ?>
 
-                    <div class="bg-image__item js-ajaxImg" data-id="<?php echo $val['id']; ?>">
+                    <div class="image__item-m js-ajaxImg" data-id="<?php echo $val['id']; ?>">
                         <img src="<?php echo '../dist/'.showImg(sanitize($val['name'])); ?>" alt="">
-                        <div class="bg-image__icon js-heart 
+                        <div class="image__icon js-heart 
                             <?php if(array_key_exists('user_id', $_SESSION)){
                                     if( isLike($_SESSION['user_id'], $val['id']) ){ echo 'active'; }
                                 }
-                            ?>">♡
+                            ?>">
+                            <i class="far fa-heart fav <?php if(!empty($_SESSION['user_id'])){ echo 'js-click-animation'; } ?>"></i>
+                            <i class="fas fa-heart fav2 js-click-animation2"></i>
                         </div>
                     </div>
 
@@ -186,7 +199,7 @@ debug('$heroImg:'.print_r($heroImg[0]['name'],true));
             </div> 
             <!-- bg-image --> 
 
-            <?php echo pagination($currentPageNum, $images['total_page']);?>
+            <?php echo pagination($currentPageNum, $images['total_page'],'&category='.$category.'&sort='.$sort);?>
 
         </div> 
         <!-- container container--l -->

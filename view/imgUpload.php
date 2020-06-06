@@ -193,8 +193,10 @@ if(!empty($_POST)) {
 
             }
         }
-        // debug('アップロード成功');
-        // header("Location:index.php");
+
+        $_SESSION['msg_success'] = SUC03;
+        debug('アップロード成功');
+        header("Location:index.php");
 
         } catch (Exeption $e){
             error_log('エラー発生：'. $e->getMessage());
@@ -212,38 +214,24 @@ $title = 'イメージアップロード';
 require('head.php');
 ?>
 
-<style>
-
-/* //////////////////// */
-/*       utility
-/* //////////////////// */
-.mt{
-    margin-top: 50px;
-}
-</style>
-
 <body>
 
-    <header class="l-header header header--fix isHeaderColor" id="header">
+    <header class="l-header header header--bgColor" id="header">
         <h1><a href="./index.php" class="header__title">FEEL_SHARE</a></h1>
 
-        <nav class="nav-menu">
+        <div class="menu-trigger js-toggle-sp-menu">
+            <span class="menu-trigger__item"></span>
+            <span class="menu-trigger__item"></span>
+            <span class="menu-trigger__item"></span>
+        </div>
+
+        <nav class="nav-menu js-toggle-sp-menu-target">
             <ul class="nav-menu__menu">
-                <li class="nav-menu__list-item"><a href="./index.php">ホーム</a></li>
-                <?php
-                    if(empty($_SESSION['user_id'])){
-                ?>
-                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link">登録</a></li>
-                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link">ログイン</a></li>
-                <?php
-                    } else {
-                ?>
-                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link">ログアウト</a></li>
-                    <li class="nav-menu__list-item"><a href="./myPage.php" class="nav-menu__list-link">マイページ</a></li>
-                    <li class="nav-menu__list-item"><a href="" class="nav-menu__list-link btn btn--header">アップロード</a></li>
-                <?php
-                    }
-                ?>
+                <li class="nav-menu__list-item"><a href="./index.php" class="nav-menu__list-link">ホーム</a></li>
+                <li class="nav-menu__list-item"><a href="./logout.php" class="nav-menu__list-link">ログアウト</a></li>
+                <li class="nav-menu__list-item"><a href="./myPage.php" class="nav-menu__list-link">マイページ</a></li>
+                <li class="nav-menu__list-item"><a href="./contact.php" class="nav-menu__list-link">お問い合わせ</a></li>
+                <li class="nav-menu__list-item"><a href="./imgUpload.php" class="nav-menu__list-link btn btn--header">アップロード</a></li>
             </ul>
         </nav>
 
@@ -252,7 +240,7 @@ require('head.php');
     <main>
         <div class="container container--m">
         
-            <form action="" method="POST" enctype="multipart/form-data" class="form mt100">
+            <form action="" method="POST" enctype="multipart/form-data" class="form form--imgUpload mt100">
 
                 <label for="file" class="label label--upload  js-drop-area">
                     <input type="hidden" name="MAX_FILE_SIZE" value="3145728">
@@ -266,7 +254,7 @@ require('head.php');
                     <div class="prev__group">
 
                         <div class="prev__left">
-                            <img src="<?php echo sanitize(getFormData('name')); ?>" class="prev-img" alt="" style="height: 100%;">
+                            <img src="<?php echo sanitize(getFormData('name')); ?>" class="prev-img" alt="">
                         </div>
 
                         <div class="prev__right">

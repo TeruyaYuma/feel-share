@@ -55,6 +55,12 @@ define('MSG08', 'そのEmailは既に登録されています');
 define('MSG09', 'メールアドレスかパスワードが間違っています');
 define('MSG10', '古いパスワードが違います');
 define('MSG11', '古いパスワードと同じです');
+define('SUC01', 'ログインしました。');
+define('SUC02', '新規登録しました。');
+define('SUC03', '画像を登録しました。');
+define('SUC04', '退会しました。');
+define('SUC05', 'プロフィール変更しました。');
+define('SUC06', 'パスワード変更しました。');
 
 //====================================
 //     データベース接続・SQL
@@ -227,15 +233,11 @@ function getImgList($currentMinNum = 1, $category, $sort, $span = 9) {
     $dbh = dbConnect();
     ////件数用sql////
     $sql = 'SELECT id FROM images';
-    if(!empty($category)) $sql .= ' WHERE id IN
-      (SELECT it.img_id FROM tags AS t RIGHT JOIN image_tag AS it ON t.id = it.tag_id WHERE name LIKE :category)';
-    if(!empty($sort)){
-      switch($sort){
-        case 0:
-          $sql .= ' ORDER BY id ASC';
-        case 1:
-          $sql .= ' ORDER BY id DESC';
-      }
+
+    if(!empty($category)){
+       $sql .= ' WHERE id IN (SELECT it.img_id FROM tags AS t RIGHT JOIN image_tag AS it ON t.id = it.tag_id WHERE name LIKE :category) AND delete_flg = 0';
+    } else {
+      $sql .= ' WHERE delete_flg = 0';
     }
 
     $data = array(':category' => '%'.$category.'%');
@@ -249,14 +251,20 @@ function getImgList($currentMinNum = 1, $category, $sort, $span = 9) {
 
     ////ページング用のSQL分作成////
     $sql = 'SELECT * FROM images';
-    if(!empty($category)) $sql .= ' WHERE id IN
-      (SELECT it.img_id FROM tags AS t RIGHT JOIN image_tag AS it ON t.id = it.tag_id WHERE name LIKE :category)';
+
+    if(!empty($category)){
+       $sql .= ' WHERE id IN (SELECT it.img_id FROM tags AS t RIGHT JOIN image_tag AS it ON t.id = it.tag_id WHERE name LIKE :category) AND delete_flg = 0';
+    } else {
+      $sql .= ' WHERE delete_flg = 0';
+    }
     if(!empty($sort)){
       switch($sort){
-        case 0:
-          $sql .= ' ORDER BY id ASC';
         case 1:
           $sql .= ' ORDER BY id DESC';
+          break;
+        case 2:
+          $sql .= ' ORDER BY id ASC';
+          break;
       }
     }
 
@@ -333,7 +341,7 @@ function getUserImages($u_id){
 
     $dbh = dbConnect();
 
-    $sql = 'SELECT id, name FROM images WHERE user_id = :id';
+    $sql = 'SELECT id, name FROM images WHERE user_id = :id AND delete_flg = 0';
     $data = array(':id' => $u_id);
 
     $stmt = queryPost($dbh, $sql, $data);
@@ -375,7 +383,7 @@ function getProductTags($i_id){
 
     $dbh = dbConnect();
 
-    $sql = 'SELECT t.id, t.name FROM image_tag AS i RIGHT JOIN tags AS t ON i.tag_id = t.id WHERE i.img_id = :i_id';
+    $sql = 'SELECT t.id, t.name FROM image_tag AS i RIGHT JOIN tags AS t ON i.tag_id = t.id WHERE i.img_id = :i_id AND delete_flg = 0';
     $data = array(':i_id' => $i_id);
 
     $stmt = queryPost($dbh, $sql, $data);
@@ -397,7 +405,7 @@ function getMsgAndBoard($b_id){
 
     $dbh = dbConnect();
 
-    $sql = 'SELECT m.id AS m_id, m.user_id, board_id, comment, m.send_date, b.id, b.to_user, b.from_user, b.create_date FROM msg AS m RIGHT JOIN boards AS b ON b.id = m.board_id WHERE b.id = :b_id';
+    $sql = 'SELECT m.id AS m_id, m.user_id, board_id, comment, m.send_date, b.id, b.to_user, b.from_user, b.create_date FROM msg AS m RIGHT JOIN boards AS b ON b.id = m.board_id WHERE b.id = :b_id AND m.delete_flg = 0 AND b.delete_flg = 0';
     $data = array(':b_id' => $b_id);
 
     $stmt = queryPost($dbh, $sql, $data);
@@ -427,7 +435,7 @@ function getMyBoardAndMsg($u_id){
 
     $dbh = dbConnect();
 
-    $sql = 'SELECT * FROM boards WHERE to_user = :u_id OR from_user = :u_id';
+    $sql = 'SELECT * FROM boards WHERE delete_flg = 0 AND to_user = :u_id OR from_user = :u_id';
     $data = array(':u_id' => $u_id);
 
     $stmt = queryPost($dbh, $sql, $data);
@@ -456,7 +464,7 @@ function getMyBoardAndMsg($u_id){
           $rst[$key] = array_merge($rst[$key], $partnerInfo);
         }
         //msgテーブル取得//
-        $sql = 'SELECT * FROM msg WHERE board_id = :b_id';
+        $sql = 'SELECT * FROM msg WHERE board_id = :b_id ORDER BY send_date DESC';
         $data = array(':b_id' => $val['id']);
 
         $stmt = queryPost($dbh, $sql, $data);
@@ -505,7 +513,7 @@ function getMyLike($u_id){
 
     $dbh = dbConnect();
 
-    $sql = 'SELECT * FROM good AS g RIGHT JOIN images AS i ON g.image_id = i.id WHERE g.user_id = :u_id';
+    $sql = 'SELECT * FROM good AS g RIGHT JOIN images AS i ON g.image_id = i.id WHERE g.user_id = :u_id AND delete_flg = 0';
     $data = array(':u_id' => $u_id);
 
     $stmt = queryPost($dbh, $sql, $data);
@@ -610,6 +618,14 @@ function showImg($path) {
 function costumFilter($val){
   return !(is_null($val) || $val === '');
 }
+// フラッシュメッセージ
+function getSessionFlash($key){
+  if(!empty($_SESSION[$key])){
+    $data = $_SESSION[$key];
+    $_SESSION[$key] = '';
+    return $data;
+  }
+}
 //サニタイズ//
 function sanitize($str) {
   return htmlspecialchars($str, ENT_QUOTES);
@@ -668,7 +684,7 @@ function makeRandKey($length = 8) {
   return $key;
 }
 //ページネーション//
-function pagination( $currentPageNum, $totalPageNum, $pageColNum = 5) {
+function pagination( $currentPageNum, $totalPageNum, $link = '', $pageColNum = 5) {
   if($currentPageNum == $totalPageNum && $totalPageNum >= $pageColNum){
     debug('パターン１');
     $minPageNum  = $currentPageNum -4;
@@ -700,15 +716,15 @@ function pagination( $currentPageNum, $totalPageNum, $pageColNum = 5) {
     echo '<ul class="pagination-list">';
 
       if($currentPageNum != 1) {
-        echo '<li class="list-item"><a href="?p=1">&lt;</a></li>';
+        echo '<li class="list-item"><a href="?p=1'.$link.'">&lt;</a></li>';
       }
       for($i = $minPageNum; $i <= $maxPageNum; $i++){
         echo '<li class="list-item ';
         if($currentPageNum == $i){ echo 'active'; }
-        echo '"><a href="?p='.$i.'">'.$i.'</a></li>';
+        echo '"><a href="?p='.$i.$link.'">'.$i.'</a></li>';
       }
       if($currentPageNum != $maxPageNum && $maxPageNum > 1){
-        echo '<li class="list-item"><a href="?p='.$maxPageNum.'">&gt;</a></li>';
+        echo '<li class="list-item"><a href="?p='.$maxPageNum.$link.'">&gt;</a></li>';
       }
 
     echo '</ul>';

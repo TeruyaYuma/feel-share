@@ -37,8 +37,12 @@ if( isset($_POST['id']) && isset($_SESSION['user_id']) && isLogin() ){
 
             $stmt = queryPost($dbh, $sql, $data);
         }
+
     } catch (Exeption $e) {
         error_log('エラーが発生しました。'. $e->getMessage());
 
     }
+} else {
+    $rst = false;
+    echo json_encode($rst);
 }
